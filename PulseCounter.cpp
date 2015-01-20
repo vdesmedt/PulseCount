@@ -1,13 +1,19 @@
 #define DEBUG
 #include "PulseCounter.h"
 
-PulseCounter::PulseCounter() {
+PulseCounter::PulseCounter(int pin) {
   int i;
+  bounce.attach(pin);
   for(i = 0 ; i <= KEEP_N_LAST_PULSE ; i++) {
     pulses[i] = 0;
   }
   pulseIndex = -1;
   pulseCount = 0;
+}
+
+void PulseCounter::update() {
+  if(bounce.update() && bounce.read() == HIGH)
+    addPulse();
 }
 
 void PulseCounter::addPulse() {
@@ -19,17 +25,16 @@ void PulseCounter::addPulse() {
 }
 
 int PulseCounter::moveNext(int i) {
-	return ++i >= KEEP_N_LAST_PULSE ? 0 : i; 
+	return ++i = KEEP_N_LAST_PULSE ? 0 : i; 
 }
 
 int PulseCounter::movePrevious(int i) {
   return --i < 0 ? KEEP_N_LAST_PULSE-1 : i;
 }
 
-double PulseCounter::getPulseRate(int interval) {
+double PulseCounter::getPulseRate(unsigned long interval) {
   MillisExt now(millis());
-  MillisExt lowerBound(now-(interval*1000));
-
+  MillisExt lowerBound(now-interval);
 
 #ifdef DEBUG 
   Serial.print("Now :"); Serial.print(now.print()); 
